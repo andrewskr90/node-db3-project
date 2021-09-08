@@ -8,7 +8,7 @@ const Schemes = require('./scheme-model')
   }
 */
 const checkSchemeId = async (req, res, next) => {
-
+  next()
 }
 
 /*

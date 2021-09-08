@@ -1,4 +1,5 @@
 const db = require('../../data/db-config')
+
 async function find() { 
   const allSteps = await db('schemes as sc')
     .join('steps as st', 'sc.scheme_id', 'st.scheme_id')
@@ -43,7 +44,19 @@ async function find() {
   */
 
 
-function findById(scheme_id) { // EXERCISE B
+async function findById(scheme_id) {
+  return db('schemes as sc')
+    .join('steps as st', 'sc.scheme_id', 'st.scheme_id')
+    .select('sc.scheme_name',
+      'st.step_id',
+      'st.step_number',
+      'st.instructions',
+      'st.scheme_id')
+    .where('st.scheme_id', scheme_id)
+    .orderBy('st.step_number')
+}
+
+  // EXERCISE B
   /*
     1B- Study the SQL query below running it in SQLite Studio against `data/schemes.db3`:
 
@@ -109,7 +122,7 @@ function findById(scheme_id) { // EXERCISE B
         "steps": []
       }
   */
-}
+
 
 function findSteps(scheme_id) { // EXERCISE C
   /*
