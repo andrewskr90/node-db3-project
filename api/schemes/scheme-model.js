@@ -1,4 +1,30 @@
-function find() { // EXERCISE A
+const db = require('../../data/db-config')
+async function find() { 
+  const allSteps = await db('schemes as sc')
+    .join('steps as st', 'sc.scheme_id', 'st.scheme_id')
+    .select('sc.scheme_id', 'sc.scheme_name', 'st.step_id')
+    .orderBy('sc.scheme_id')
+
+  const schemesArray = await db('schemes as sc')
+    .select('sc.scheme_id', 'sc.scheme_name')
+
+    const finalForm = schemesArray.map(scheme => {
+
+      let schemeStepArray = allSteps.filter(step => {
+      step.scheme_id === scheme.scheme_id
+      })
+
+      return {
+        scheme_id: scheme.scheme_id,
+        scheme_name: scheme.scheme_name,
+        number_of_steps: schemeStepArray.length
+      }
+  })
+  return finalForm
+
+  }
+  
+  // EXERCISE A
   /*
     1A- Study the SQL query below running it in SQLite Studio against `data/schemes.db3`.
     What happens if we change from a LEFT join to an INNER join?
@@ -15,7 +41,7 @@ function find() { // EXERCISE A
     2A- When you have a grasp on the query go ahead and build it in Knex.
     Return from this function the resulting dataset.
   */
-}
+
 
 function findById(scheme_id) { // EXERCISE B
   /*
