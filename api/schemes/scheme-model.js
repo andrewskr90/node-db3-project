@@ -14,14 +14,14 @@ async function find() {
       let schemeStepArray = allSteps.filter(step => {
       return step.scheme_id === scheme.schemeId
       })
-      console.log(scheme)
 
       return {
-        scheme_id: scheme.schemeid,
+        scheme_id: scheme.schemeId,
         scheme_name: scheme.scheme_name,
         number_of_steps: schemeStepArray.length
       }  
-  })
+    })
+    console.log(stepArray)
 
   return stepArray
 
