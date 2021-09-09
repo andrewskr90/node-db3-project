@@ -83,7 +83,6 @@ router.get('/:scheme_id', checkSchemeId, (req, res, next) => {
 */
 router.get('/:scheme_id/steps', checkSchemeId, (req, res, next) => {
   const { scheme_id } = req.params
-  console.log('made it here in the router')
 
   Schemes.findSteps(scheme_id)
     .then(steps => {
