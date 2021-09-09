@@ -7,21 +7,23 @@ async function find() {
     .orderBy('sc.scheme_id')
 
   const schemesArray = await db('schemes as sc')
-    .select('sc.scheme_id', 'sc.scheme_name')
-
-    const finalForm = schemesArray.map(scheme => {
+    .select('sc.scheme_id as schemeId', 'sc.scheme_name',)
+  
+    const stepArray = schemesArray.map(scheme => {
 
       let schemeStepArray = allSteps.filter(step => {
-      step.scheme_id === scheme.scheme_id
+      return step.scheme_id === scheme.schemeId
       })
+      console.log(scheme)
 
       return {
-        scheme_id: scheme.scheme_id,
+        scheme_id: scheme.schemeid,
         scheme_name: scheme.scheme_name,
         number_of_steps: schemeStepArray.length
-      }
+      }  
   })
-  return finalForm
+
+  return stepArray
 
   }
   
@@ -44,17 +46,54 @@ async function find() {
   */
 
 
-async function findById(scheme_id) {
-  return db('schemes as sc')
-    .join('steps as st', 'sc.scheme_id', 'st.scheme_id')
-    .select('sc.scheme_name',
-      'st.step_id',
-      'st.step_number',
-      'st.instructions',
-      'st.scheme_id')
-    .where('st.scheme_id', scheme_id)
-    .orderBy('st.step_number')
-}
+//     SELECT
+//     sc.*,
+//     st.step_id, st.step_number, st.instructions
+// FROM schemes as sc
+// LEFT JOIN steps as st
+//     ON sc.scheme_id = st.scheme_id
+// WHERE sc.scheme_id = 7
+// ORDER BY st.step_number ASC;
+
+async function findById(schemeId) {
+    const rawSchemeArray = await db('schemes as sc')
+      .leftJoin('steps as st', 'st.scheme_id', 'sc.scheme_id')
+      .select('sc.scheme_name',
+        'st.step_id',
+        'st.step_number',
+        'st.instructions',
+        'sc.scheme_id')
+      .where('sc.scheme_id', schemeId)
+      .orderBy('st.step_number')
+
+      const schemeStepArray = rawSchemeArray.map(scheme => {
+        return {
+          step_id: scheme.step_id,
+          step_number: scheme.step_number,
+          instructions: scheme.instructions
+        }
+      })
+
+      if (schemeStepArray[0].step_id === null) {
+        const noSteps= {
+          scheme_id: rawSchemeArray[0].scheme_id,
+          scheme_name: rawSchemeArray[0].scheme_name,
+          steps: []
+        }
+
+        return noSteps
+
+      } else {
+        const formattedScheme = {
+          scheme_id: rawSchemeArray[0].scheme_id,
+          scheme_name: rawSchemeArray[0].scheme_name,
+          steps: schemeStepArray
+        }
+
+        return formattedScheme
+      }
+  }
+
 
   // EXERCISE B
   /*
@@ -124,8 +163,33 @@ async function findById(scheme_id) {
   */
 
 
-function findSteps(scheme_id) { // EXERCISE C
+async function findSteps(scheme_id) { 
+  const possibleSteps = await db('schemes as sc')
+    .leftJoin('steps as st', 'st.scheme_id', 'sc.scheme_id')
+    .select('sc.scheme_name',
+      'st.step_id',
+      'st.step_number',
+      'st.instructions')
+    .where('sc.scheme_id', scheme_id)
+    .orderBy('st.step_number')
+    console.log(possibleSteps[0].instructions)
+    console.log('possible steps log',possibleSteps)
+  
+  if (possibleSteps[0].instructions === null) {
+    return []
+  } else {
+    return possibleSteps
+  }
+  
+  // EXERCISE C
   /*
+
+    select * from schemes as sc
+    left join steps as st
+    on sc.scheme_id = st.scheme_id
+    where sc.scheme_id = 7
+    order by st.step_number;
+
     1C- Build a query in Knex that returns the following data.
     The steps should be sorted by step_number, and the array
     should be empty if there are no steps for the scheme:
