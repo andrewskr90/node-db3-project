@@ -172,8 +172,6 @@ async function findSteps(scheme_id) {
       'st.instructions')
     .where('sc.scheme_id', scheme_id)
     .orderBy('st.step_number')
-    console.log(possibleSteps[0].instructions)
-    console.log('possible steps log',possibleSteps)
   
   if (possibleSteps[0].instructions === null) {
     return []
@@ -211,13 +209,27 @@ async function findSteps(scheme_id) {
   */
 }
 
-function add(scheme) { // EXERCISE D
+async function add(scheme) {
+    const [id] = await db('schemes').insert(scheme)
+    return findById(id)
+}
+  // EXERCISE D
   /*
     1D- This function creates a new scheme and resolves to _the newly created scheme_.
   */
-}
 
-function addStep(scheme_id, step) { // EXERCISE E
+
+async function addStep(scheme_id, step) {
+
+  const stepFormat = {
+    step_number: step.step_number,
+    instructions: step.instructions,
+    scheme_id: scheme_id
+  }
+  await db('steps').insert(stepFormat)
+  const result = await findSteps(scheme_id)
+  return(result)
+  // EXERCISE E
   /*
     1E- This function adds a step to the scheme with the given `scheme_id`
     and resolves to _all the steps_ belonging to the given `scheme_id`,
